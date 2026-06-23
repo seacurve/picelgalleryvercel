@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Picel — Gallery</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --accent: #e8c4a0;
+      --accent2: #c9956b;
+      --text: #f5f0eb;
+      --muted: rgba(245,240,235,0.45);
+      --vip: #d4af7a;
+      --lock-bg: rgba(10,10,10,0.82);
+      --radius: 16px;
+      --font-display: 'Georgia', serif;
+      --font-body: system-ui, -apple-system, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 12px 16px 8px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 60%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #header .brand {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+    }
+
+    #header .brand span {
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--font-body);
+      font-style: italic;
+      margin-left: 6px;
+    }
+
+    /* ── Filter tabs ── */
+    #filters {
+      position: fixed;
+      top: 52px; left: 0; right: 0;
+      z-index: 99;
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.9) 70%, transparent);
+    }
+    #filters::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      flex-shrink: 0;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(232,196,160,0.25);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .filter-btn.active {
+      background: var(--accent2);
+      border-color: var(--accent2);
+      color: #0a0a0a;
+      font-weight: 600;
+    }
+
+    /* ── Feed ── */
+    #feed {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+    }
+    #feed::-webkit-scrollbar { display: none; }
+
+    /* ── Card ── */
+    .card {
+      height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      background: #111;
+      cursor: pointer;
+    }
+
+    .card-thumb {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-thumb-placeholder {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a1f1a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-thumb-placeholder svg {
+      opacity: 0.2;
+    }
+
+    /* gradient overlay */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 30%,
+        rgba(10,10,10,0.3) 60%,
+        rgba(10,10,10,0.85) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* ── VIP lock overlay ── */
+    .lock-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--lock-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .lock-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(212,175,122,0.15);
+      border: 1px solid rgba(212,175,122,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lock-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--vip);
+      text-align: center;
+    }
+
+    .lock-sub {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      max-width: 220px;
+      line-height: 1.5;
+    }
+
+    .lock-btn {
+      margin-top: 4px;
+      padding: 12px 28px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--accent2), var(--vip));
+      color: #0a0a0a;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Card info ── */
+    .card-info {
+      position: relative;
+      z-index: 5;
+      padding: 0 16px 32px;
+      width: 100%;
+    }
+
+    .card-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .card-tag.free { background: rgba(255,255,255,0.12); color: var(--muted); }
+    .card-tag.vip  { background: rgba(212,175,122,0.2); color: var(--vip); border: 1px solid rgba(212,175,122,0.3); }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      line-height: 1.3;
+      color: var(--text);
+      margin-bottom: 6px;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+
+    .card-meta {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-meta .views {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Play button ── */
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(232,196,160,0.15);
+      border: 2px solid rgba(232,196,160,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: transform 0.15s, background 0.15s;
+    }
+    .card:active .play-btn {
+      transform: translate(-50%, -50%) scale(0.93);
+      background: rgba(232,196,160,0.25);
+    }
+
+    /* ── Empty state ── */
+    #empty {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      display: none;
+    }
+
+    /* ── Loading ── */
+    #loading {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 2px solid rgba(232,196,160,0.15);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── NEW badge ── */
+    .new-badge {
+      display: inline-block;
+      background: #e05c5c;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 8px;
+      letter-spacing: 0.05em;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <div class="brand">Picel <span>by picelmareen</span></div>
+</div>
+
+<div id="filters">
+  <button class="filter-btn active" data-filter="all">Semua</button>
+  <button class="filter-btn" data-filter="free">Free</button>
+  <button class="filter-btn" data-filter="vip">⭐ VIP</button>
+</div>
+
+<div id="loading"><div class="spinner"></div></div>
+<div id="feed"></div>
+<div id="empty">
+  <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+  <p>Belum ada video di sini</p>
+</div>
+
+<script>
+  // ── CONFIG — ganti dengan data kamu ──────────────────────────────────────
+  const SUPABASE_URL = 'https://irxgakgqekaeyiseorya.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyeGdha2dxZWthZXlpc2VvcnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk4OTAsImV4cCI6MjA5Nzc3NTg5MH0.6Wk7JX_u5frC9PxOUcuQhh8FGocno19tQPxd6aJzDPE';
+  const VIP_CHANNEL_URL = 'https://t.me/+kzzqCLI6jIw3MWI1'; // link invite Jolie Privée
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.expand(); tg.setHeaderColor('#0a0a0a'); tg.setBackgroundColor('#0a0a0a'); }
+
+  let allVideos = [];
+  let activeFilter = 'all';
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+  function isNew(postedAt) {
+    if (!postedAt) return false;
+    return Date.now() - new Date(postedAt).getTime() < ONE_WEEK_MS;
+  }
+
+  function formatDuration(sec) {
+    if (!sec) return '';
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  async function fetchVideos() {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/videos?select=*&order=posted_at.desc&limit=200`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    if (!res.ok) throw new Error('Gagal fetch');
+    return res.json();
+  }
+
+  async function incrementView(id) {
+    await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_view`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ video_id: id }),
+    }).catch(() => {});
+  }
+
+  function buildCard(video) {
+    const isVip = video.tier === 'vip';
+    const fresh = isNew(video.posted_at);
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.id = video.id;
+    card.dataset.url = video.telegram_url;
+    card.dataset.tier = video.tier;
+
+    // Thumbnail
+    if (video.thumbnail_url) {
+      const img = document.createElement('img');
+      img.className = 'card-thumb';
+      img.src = video.thumbnail_url;
+      img.alt = video.title;
+      img.loading = 'lazy';
+      card.appendChild(img);
+    } else {
+      const ph = document.createElement('div');
+      ph.className = 'card-thumb-placeholder';
+      ph.innerHTML = `<svg width="64" height="64" fill="none" viewBox="0 0 24 24"><path stroke="#fff" stroke-width="1.2" d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>`;
+      card.appendChild(ph);
+    }
+
+    // VIP lock
+    if (isVip) {
+      const lock = document.createElement('div');
+      lock.className = 'lock-overlay';
+      lock.innerHTML = `
+        <div class="lock-icon">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#d4af7a" stroke-width="1.8" stroke-linecap="round" d="M7 11V7a5 5 0 0110 0v4M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z"/></svg>
+        </div>
+        <div class="lock-title">Konten Eksklusif</div>
+        <div class="lock-sub">Gabung Jolie Privée untuk akses konten premium Picel</div>
+        <button class="lock-btn" onclick="openVip(event)">⭐ Gabung Sekarang</button>
+      `;
+      card.appendChild(lock);
+    } else {
+      // Play button hanya untuk free
+      const playBtn = document.createElement('div');
+      playBtn.className = 'play-btn';
+      playBtn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 4l14 8-14 8V4z" fill="#e8c4a0"/></svg>`;
+      card.appendChild(playBtn);
+    }
+
+    // Info
+    const info = document.createElement('div');
+    info.className = 'card-info';
+    info.innerHTML = `
+      <span class="card-tag ${video.tier}">${isVip ? '⭐ VIP' : 'Free'}</span>
+      <div class="card-title">
+        ${video.title || 'Picel'}
+        ${fresh ? '<span class="new-badge">NEW</span>' : ''}
+      </div>
+      <div class="card-meta">
+        ${video.duration ? `<span>${formatDuration(video.duration)}</span>` : ''}
+        <span class="views">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          ${video.view_count ?? 0}
+        </span>
+      </div>
+    `;
+    card.appendChild(info);
+
+    // Click handler
+    if (!isVip) {
+      card.addEventListener('click', () => openVideo(video));
+    }
+
+    return card;
+  }
+
+  function openVideo(video) {
+    incrementView(video.id);
+    if (tg) {
+      tg.openLink(video.telegram_url);
+    } else {
+      window.open(video.telegram_url, '_blank');
+    }
+  }
+
+  function openVip(e) {
+    e.stopPropagation();
+    if (tg) {
+      tg.openLink(VIP_CHANNEL_URL);
+    } else {
+      window.open(VIP_CHANNEL_URL, '_blank');
+    }
+  }
+
+  function renderFeed(videos) {
+    const feed = document.getElementById('feed');
+    const empty = document.getElementById('empty');
+    feed.innerHTML = '';
+
+    const filtered = activeFilter === 'all'
+      ? videos
+      : videos.filter(v => v.tier === activeFilter);
+
+    if (filtered.length === 0) {
+      empty.style.display = 'flex';
+      return;
+    }
+    empty.style.display = 'none';
+
+    filtered.forEach(v => feed.appendChild(buildCard(v)));
+
+    // Build tag filter buttons dynamically
+    buildTagFilters(videos);
+  }
+
+  function buildTagFilters(videos) {
+    const allTags = new Set();
+    videos.forEach(v => (v.tags || []).forEach(t => allTags.add(t)));
+
+    const filters = document.getElementById('filters');
+    // Remove existing tag buttons
+    filters.querySelectorAll('.filter-btn[data-tag]').forEach(b => b.remove());
+
+    allTags.forEach(tag => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.dataset.filter = tag;
+      btn.dataset.tag = tag;
+      btn.textContent = `#${tag}`;
+      btn.addEventListener('click', () => setFilter(tag, btn));
+      filters.appendChild(btn);
+    });
+  }
+
+  function setFilter(filter, btn) {
+    activeFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFeed(allVideos);
+  }
+
+  // Filter button events
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => setFilter(btn.dataset.filter, btn));
+  });
+
+  // Init
+  (async () => {
+    try {
+      allVideos = await fetchVideos();
+      document.getElementById('loading').style.display = 'none';
+      renderFeed(allVideos);
+    } catch (err) {
+      document.getElementById('loading').innerHTML = `<p style="color:var(--muted);font-size:13px">Gagal memuat. Coba lagi.</p>`;
+    }
+  })();
+</script>
+</body>
+</html>

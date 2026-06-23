@@ -2,15 +2,16 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover" />
   <title>Picel — Gallery</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=mwBU8h65Aqr3pQWeVmrlBdHdfyFWAu26wn_STEoXhWAuLpndCyetxMecAk7vzdNlh9EGA1Obs9fpt-q-A-32euYsYpiWl82rP2q-flcqjY1k4kYSKBFVPO0q8we2S0HgJ8F_M0HtsP5qfnqd0tHHruQoIs40VwxDDkQ0JajLC8ii-7YoOzC9GxXwkaDwQTdif3N97j7f1vXRBnIlVjQhE5QsRKLJJ7Gp9mm-_go_y8j2O-X3810kGGa-ZrmUfnA5CNqjjtNEwtbzJ99yI3tLdtyc5371N5ZNMqckg0gkDXxgxZCU-zW3DVNsx3z3EWm9d79wUCTO_utNGkLZUSHNaAE4wmrjDNyNDMrKuznU46biJKQlyzyltQzc3e_f07cG28-Atu0_Bqe7Hsb3WyKaYuTf-7T_HeOvuszXplCBRxUHDUMZVJDgv0-FYncb5ROSlPsJSBQfD2F5Kj-IobIGPV1B6LnRz5OwST2c6mc1VDontPYCOHC-34WXSIoC-U1sl4bDQq7kfFBxlfZwVV53fsIKWs5werRsng4YrzldtCfak_YSEM_TpEge6r0EOCnKbMn3qOaVra86G5Mz5aPaIjxN5-oq1ls6IIvIUtKeGswNzExao9bFITt0fmiR6iyeJYD5boqCeDKk8i-Cb57ekw" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9wcm9kLWNoYXQta2ltaS50b3MtY24tYmVpamluZy52b2xjZXMuY29tL2tpbWktZnMvb2tjL3pqbzZvbXM2cG50a28vb3V0cHV0L2luZGV4Lmh0bWw_WC1Ub3MtQWxnb3JpdGhtPVRPUzQtSE1BQy1TSEEyNTYmWC1Ub3MtQ3JlZGVudGlhbD1BS0xUWVRKbE5qZ3dNalkyWkRCa05ERmlZbUk1WVdOaVpEQmxabUZtWWpJelpUQSUyZjIwMjYwNjIzJTJmY24tYmVpamluZyUyZnRvcyUyZnJlcXVlc3QmWC1Ub3MtRGF0ZT0yMDI2MDYyM1QxNTAyMjJaJlgtVG9zLUV4cGlyZXM9NTE4NDAwJlgtVG9zLVNpZ25hdHVyZT0wMWMxZGI4ZDg3NTVhYzc2MDJlZjMwNjcxYmJiM2RhYjUyNDU2M2MzYzhhN2JjMTRkMDE3NmQ4OWM1ZTJjNWVjJlgtVG9zLVNpZ25lZEhlYWRlcnM9aG9zdCZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWF0dGFjaG1lbnQlM2IlMjBmaWxlbmFtZSUyYSUzZFVURi04JTI3JTI3aW5kZXguaHRtbA"/><script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     :root {
       --bg: #0a0a0a;
       --surface: #141414;
+      --surface2: #1a1a1a;
       --accent: #e8c4a0;
       --accent2: #c9956b;
       --text: #f5f0eb;
@@ -28,6 +29,16 @@
       color: var(--text);
       font-family: var(--font-body);
       overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    /* ── App Container ── */
+    #app {
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-top: 100px; /* space for fixed header + filters */
+      padding-bottom: 24px;
     }
 
     /* ── Header ── */
@@ -36,7 +47,7 @@
       top: 0; left: 0; right: 0;
       z-index: 100;
       padding: 12px 16px 8px;
-      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 60%, transparent);
+      background: linear-gradient(to bottom, rgba(10,10,10,0.98) 60%, transparent);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -67,7 +78,7 @@
       padding: 0 16px 10px;
       overflow-x: auto;
       scrollbar-width: none;
-      background: linear-gradient(to bottom, rgba(10,10,10,0.9) 70%, transparent);
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 70%, transparent);
     }
     #filters::-webkit-scrollbar { display: none; }
 
@@ -90,24 +101,26 @@
       font-weight: 600;
     }
 
-    /* ── Feed ── */
-    #feed {
-      height: 100vh;
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      scrollbar-width: none;
+    /* ── Gallery Grid ── */
+    #gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 0 12px;
     }
-    #feed::-webkit-scrollbar { display: none; }
 
     /* ── Card ── */
     .card {
-      height: 100vh;
-      scroll-snap-align: start;
       position: relative;
-      display: flex;
-      align-items: flex-end;
-      background: #111;
+      aspect-ratio: 3/4;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface2);
       cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .card:active {
+      transform: scale(0.97);
     }
 
     .card-thumb {
@@ -117,6 +130,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      image-rendering: -webkit-optimize-contrast;
     }
 
     .card-thumb-placeholder {
@@ -139,9 +153,9 @@
       inset: 0;
       background: linear-gradient(
         to bottom,
-        transparent 30%,
-        rgba(10,10,10,0.3) 60%,
-        rgba(10,10,10,0.85) 100%
+        transparent 40%,
+        rgba(10,10,10,0.5) 70%,
+        rgba(10,10,10,0.9) 100%
       );
       pointer-events: none;
     }
@@ -151,19 +165,21 @@
       position: absolute;
       inset: 0;
       background: var(--lock-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
       z-index: 10;
+      padding: 12px;
+      text-align: center;
     }
 
     .lock-icon {
-      width: 56px;
-      height: 56px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: rgba(212,175,122,0.15);
       border: 1px solid rgba(212,175,122,0.3);
@@ -174,27 +190,24 @@
 
     .lock-title {
       font-family: var(--font-display);
-      font-size: 20px;
+      font-size: 14px;
       color: var(--vip);
-      text-align: center;
     }
 
     .lock-sub {
-      font-size: 13px;
+      font-size: 11px;
       color: var(--muted);
-      text-align: center;
-      max-width: 220px;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .lock-btn {
-      margin-top: 4px;
-      padding: 12px 28px;
-      border-radius: 30px;
+      margin-top: 2px;
+      padding: 8px 18px;
+      border-radius: 20px;
       background: linear-gradient(135deg, var(--accent2), var(--vip));
       color: #0a0a0a;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 12px;
       border: none;
       cursor: pointer;
       letter-spacing: 0.02em;
@@ -202,46 +215,52 @@
 
     /* ── Card info ── */
     .card-info {
-      position: relative;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       z-index: 5;
-      padding: 0 16px 32px;
-      width: 100%;
+      padding: 10px 10px 12px;
     }
 
     .card-tag {
       display: inline-block;
-      padding: 3px 10px;
-      border-radius: 10px;
-      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 10px;
       font-weight: 600;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .card-tag.free { background: rgba(255,255,255,0.12); color: var(--muted); }
     .card-tag.vip  { background: rgba(212,175,122,0.2); color: var(--vip); border: 1px solid rgba(212,175,122,0.3); }
 
     .card-title {
       font-family: var(--font-display);
-      font-size: 18px;
+      font-size: 13px;
       line-height: 1.3;
       color: var(--text);
-      margin-bottom: 6px;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
     }
 
     .card-meta {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .card-meta .views {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
 
     /* ── Play button ── */
@@ -251,25 +270,19 @@
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 6;
-      width: 64px;
-      height: 64px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: rgba(232,196,160,0.15);
-      border: 2px solid rgba(232,196,160,0.4);
+      background: rgba(232,196,160,0.2);
+      border: 1.5px solid rgba(232,196,160,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(4px);
-      transition: transform 0.15s, background 0.15s;
-    }
-    .card:active .play-btn {
-      transform: translate(-50%, -50%) scale(0.93);
-      background: rgba(232,196,160,0.25);
     }
 
     /* ── Empty state ── */
     #empty {
-      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -277,15 +290,16 @@
       gap: 12px;
       color: var(--muted);
       font-size: 14px;
+      padding: 60px 20px;
       display: none;
     }
 
     /* ── Loading ── */
     #loading {
-      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 60px;
     }
 
     .spinner {
@@ -303,13 +317,22 @@
       display: inline-block;
       background: #e05c5c;
       color: #fff;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 8px;
+      padding: 1px 5px;
+      border-radius: 6px;
       letter-spacing: 0.05em;
       vertical-align: middle;
-      margin-left: 6px;
+      margin-left: 4px;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 16px 8px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -325,22 +348,30 @@
   <button class="filter-btn" data-filter="vip">⭐ VIP</button>
 </div>
 
-<div id="loading"><div class="spinner"></div></div>
-<div id="feed"></div>
-<div id="empty">
-  <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-  <p>Belum ada video di sini</p>
+<div id="app">
+  <div id="loading"><div class="spinner"></div></div>
+  <div id="gallery"></div>
+  <div id="empty">
+    <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+    <p>Belum ada video di sini</p>
+  </div>
 </div>
 
 <script>
   // ── CONFIG — ganti dengan data kamu ──────────────────────────────────────
   const SUPABASE_URL = 'https://irxgakgqekaeyiseorya.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyeGdha2dxZWthZXlpc2VvcnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk4OTAsImV4cCI6MjA5Nzc3NTg5MH0.6Wk7JX_u5frC9PxOUcuQhh8FGocno19tQPxd6aJzDPE';
-  const VIP_CHANNEL_URL = 'https://t.me/+kzzqCLI6jIw3MWI1'; // link invite Jolie Privée
+  const VIP_CHANNEL_URL = 'https://t.me/+kzzqCLI6jIw3MWI1';
   // ─────────────────────────────────────────────────────────────────────────
 
   const tg = window.Telegram?.WebApp;
-  if (tg) { tg.expand(); tg.setHeaderColor('#0a0a0a'); tg.setBackgroundColor('#0a0a0a'); }
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#0a0a0a');
+    tg.setBackgroundColor('#0a0a0a');
+    tg.disableVerticalSwipes(); // 🔑 Fix conflict gesture
+  }
 
   let allVideos = [];
   let activeFilter = 'all';
@@ -400,7 +431,7 @@
     } else {
       const ph = document.createElement('div');
       ph.className = 'card-thumb-placeholder';
-      ph.innerHTML = `<svg width="64" height="64" fill="none" viewBox="0 0 24 24"><path stroke="#fff" stroke-width="1.2" d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>`;
+      ph.innerHTML = `<svg width="40" height="40" fill="none" viewBox="0 0 24 24"><path stroke="#fff" stroke-width="1.2" d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>`;
       card.appendChild(ph);
     }
 
@@ -410,18 +441,18 @@
       lock.className = 'lock-overlay';
       lock.innerHTML = `
         <div class="lock-icon">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="#d4af7a" stroke-width="1.8" stroke-linecap="round" d="M7 11V7a5 5 0 0110 0v4M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z"/></svg>
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path stroke="#d4af7a" stroke-width="1.8" stroke-linecap="round" d="M7 11V7a5 5 0 0110 0v4M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z"/></svg>
         </div>
-        <div class="lock-title">Konten Eksklusif</div>
-        <div class="lock-sub">Gabung Jolie Privée untuk akses konten premium Picel</div>
-        <button class="lock-btn" onclick="openVip(event)">⭐ Gabung Sekarang</button>
+        <div class="lock-title">VIP</div>
+        <div class="lock-sub">Gabung Jolie Privée</div>
+        <button class="lock-btn" onclick="openVip(event)">⭐ Gabung</button>
       `;
       card.appendChild(lock);
     } else {
       // Play button hanya untuk free
       const playBtn = document.createElement('div');
       playBtn.className = 'play-btn';
-      playBtn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 4l14 8-14 8V4z" fill="#e8c4a0"/></svg>`;
+      playBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 4l14 8-14 8V4z" fill="#e8c4a0"/></svg>`;
       card.appendChild(playBtn);
     }
 
@@ -437,7 +468,7 @@
       <div class="card-meta">
         ${video.duration ? `<span>${formatDuration(video.duration)}</span>` : ''}
         <span class="views">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
           ${video.view_count ?? 0}
         </span>
       </div>
@@ -470,10 +501,10 @@
     }
   }
 
-  function renderFeed(videos) {
-    const feed = document.getElementById('feed');
+  function renderGallery(videos) {
+    const gallery = document.getElementById('gallery');
     const empty = document.getElementById('empty');
-    feed.innerHTML = '';
+    gallery.innerHTML = '';
 
     const filtered = activeFilter === 'all'
       ? videos
@@ -485,7 +516,7 @@
     }
     empty.style.display = 'none';
 
-    filtered.forEach(v => feed.appendChild(buildCard(v)));
+    filtered.forEach(v => gallery.appendChild(buildCard(v)));
 
     // Build tag filter buttons dynamically
     buildTagFilters(videos);
@@ -514,7 +545,7 @@
     activeFilter = filter;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderFeed(allVideos);
+    renderGallery(allVideos);
   }
 
   // Filter button events
@@ -527,9 +558,9 @@
     try {
       allVideos = await fetchVideos();
       document.getElementById('loading').style.display = 'none';
-      renderFeed(allVideos);
+      renderGallery(allVideos);
     } catch (err) {
-      document.getElementById('loading').innerHTML = `<p style="color:var(--muted);font-size:13px">Gagal memuat. Coba lagi.</p>`;
+      document.getElementById('loading').innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Gagal memuat. Coba lagi.</p>`;
     }
   })();
 </script>
